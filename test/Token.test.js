@@ -1,4 +1,4 @@
-import { tokens } from './helpers'
+import { tokens, EVM_REVERT } from './helpers'
 
 const Token = artifacts.require('./Token')
 require('chai').use(require('chai-as-promised')).should()
@@ -73,7 +73,13 @@ contract('Token', ([deployer, receiver]) => {
     it('rejects insuffecient balances', async () => {
       let invalidAmount
       invalidAmount = tokens(100000000) //100 million
-      await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith('VM Exception while processing transaction: revert')
+      await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT)
+
+      invalidAmount = tokens(10)
+      await token.transfer(deployer, invalidAmount, { from: receiver }).should.be.rejectedWith(EVM_REVERT)
+    })
+    it('rejects infvalid recipients', async () => {
+      await token.transfer(0x0, amount, { from: deployer }).should.be.rejected
     })
   })
 })
