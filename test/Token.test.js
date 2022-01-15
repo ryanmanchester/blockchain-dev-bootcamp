@@ -1,7 +1,7 @@
 const Token = artifacts.require('./Token')
 require('chai').use(require('chai-as-promised')).should()
 
-contract('Token', (accounts) => {
+contract('Token', ([deployer, receiver]) => {
   let token
   const name = "DApp Token"
   const symbol = "DApp"
@@ -28,6 +28,31 @@ contract('Token', (accounts) => {
     it('tracks the total supply', async () => {
       const result = await token.totalSupply()
       result.toString().should.equal(totalSupply)
+    })
+    it('assigns total supply to deployer', async () => {
+      const result = await token.balanceOf(deployer)
+      result.toString().should.equal(totalSupply)
+    })
+  })
+
+  describe('transfers tokens', () => {
+    it('transfers token balances', async () => {
+      let balanceOf;
+      //Before transfer
+      balanceOf = await token.balanceOf(deployer)
+      console.log('deployer account:', deployer)
+      console.log('sender balance before transfer', balanceOf.toString())
+      balanceOf = await token.balanceOf(receiver)
+      console.log('receiver account:', receiver)
+      console.log('receiver balance before transfer', balanceOf.toString())
+      //Transfer
+      await token.transfer(receiver, '1000000000000000000', { from: deployer })
+      //After transfer
+      balanceOf = await token.balanceOf(deployer)
+      console.log('sender balance after transfer', balanceOf.toString())
+      balanceOf = await token.balanceOf(receiver)
+      console.log('receiver balance after transfer', balanceOf.toString())
+
     })
   })
 })
