@@ -38,33 +38,42 @@ contract('Token', ([deployer, receiver]) => {
     })
   })
 
-  describe('transfers tokens', () => {
-    let amount
-    let result
+  let amount
+  describe('success', async () => {
+    describe('transfers tokens', () => {
+      let result
 
-    beforeEach(async () => {
-      amount = tokens(100)
-      result = await token.transfer(receiver, amount, { from: deployer })
+      beforeEach(async () => {
+        amount = tokens(100)
+        result = await token.transfer(receiver, amount, { from: deployer })
+      })
+      it('transfers token balances', async () => {
+        let balanceOf;
+
+        balanceOf = await token.balanceOf(deployer)
+        balanceOf = await token.balanceOf(receiver)
+
+        balanceOf = await token.balanceOf(deployer)
+        balanceOf.toString().should.equal(tokens(999900).toString())
+        balanceOf = await token.balanceOf(receiver)
+        balanceOf.toString().should.equal(tokens(100).toString())
+
+      })
+      it('emits transfer event', async () => {
+        const log = result.logs[0]
+        log.event.should.equal('Transfer')
+        const event = log.args
+        event.from.toString().should.equal(deployer, 'from is correct')
+        event.to.toString().should.equal(receiver, 'to is correct')
+        event.value.toString().should.equal(amount.toString(), 'value is correct')
+      })
     })
-    it('transfers token balances', async () => {
-      let balanceOf;
-
-      balanceOf = await token.balanceOf(deployer)
-      balanceOf = await token.balanceOf(receiver)
-
-      balanceOf = await token.balanceOf(deployer)
-      balanceOf.toString().should.equal(tokens(999900).toString())
-      balanceOf = await token.balanceOf(receiver)
-      balanceOf.toString().should.equal(tokens(100).toString())
-
-    })
-    it('emits transfer event', async () => {
-      const log = result.logs[0]
-      log.event.should.equal('Transfer')
-      const event = log.args
-      event.from.toString().should.equal(deployer, 'from is correct')
-      event.to.toString().should.equal(receiver, 'to is correct')
-      event.value.toString().should.equal(amount.toString(), 'value is correct')
+  })
+  describe('failure', async () => {
+    it('rejects insuffecient balances', async () => {
+      let invalidAmount
+      invalidAmount = tokens(100000000) //100 million
+      await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith('VM Exception while processing transaction: revert')
     })
   })
 })
