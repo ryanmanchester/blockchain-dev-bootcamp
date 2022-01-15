@@ -1,12 +1,15 @@
+import { tokens } from './helpers'
+
 const Token = artifacts.require('./Token')
 require('chai').use(require('chai-as-promised')).should()
+
 
 contract('Token', ([deployer, receiver]) => {
   let token
   const name = "DApp Token"
   const symbol = "DApp"
   const decimals = '18'
-  const totalSupply = '1000000000000000000000000'
+  const totalSupply = tokens(1000000).toString()
 
   beforeEach(async () => {
     token = await Token.new()
@@ -46,11 +49,13 @@ contract('Token', ([deployer, receiver]) => {
       console.log('receiver account:', receiver)
       console.log('receiver balance before transfer', balanceOf.toString())
       //Transfer
-      await token.transfer(receiver, '1000000000000000000', { from: deployer })
+      await token.transfer(receiver, tokens(100), { from: deployer })
       //After transfer
       balanceOf = await token.balanceOf(deployer)
+      balanceOf.toString().should.equal(tokens(999900).toString())
       console.log('sender balance after transfer', balanceOf.toString())
       balanceOf = await token.balanceOf(receiver)
+      balanceOf.toString().should.equal(tokens(100).toString())
       console.log('receiver balance after transfer', balanceOf.toString())
 
     })
