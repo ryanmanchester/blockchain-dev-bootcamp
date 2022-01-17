@@ -4,7 +4,7 @@ const Token = artifacts.require('./Token')
 require('chai').use(require('chai-as-promised')).should()
 
 
-contract('Token', ([deployer, receiver]) => {
+contract('Token', ([deployer, receiver, exchange]) => {
   let token
   const name = "DApp Token"
   const symbol = "DApp"
@@ -38,10 +38,12 @@ contract('Token', ([deployer, receiver]) => {
     })
   })
 
-  let amount
-  describe('success', async () => {
-    describe('transfers tokens', () => {
+
+  describe('transfers tokens', () => {
+    let amount
+    describe('success', () => {
       let result
+
 
       beforeEach(async () => {
         amount = tokens(100)
@@ -68,18 +70,39 @@ contract('Token', ([deployer, receiver]) => {
         event.value.toString().should.equal(amount.toString(), 'value is correct')
       })
     })
-  })
-  describe('failure', async () => {
-    it('rejects insuffecient balances', async () => {
-      let invalidAmount
-      invalidAmount = tokens(100000000) //100 million
-      await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT)
+    describe('failure', () => {
+      it('rejects insuffecient balances', async () => {
+        let invalidAmount
+        invalidAmount = tokens(100000000) //100 million
+        await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT)
 
-      invalidAmount = tokens(10)
-      await token.transfer(deployer, invalidAmount, { from: receiver }).should.be.rejectedWith(EVM_REVERT)
+        invalidAmount = tokens(10)
+        await token.transfer(deployer, invalidAmount, { from: receiver }).should.be.rejectedWith(EVM_REVERT)
+      })
+      it('rejects infvalid recipients', async () => {
+        await token.transfer(0x0, amount, { from: deployer }).should.be.rejected
+      })
     })
-    it('rejects infvalid recipients', async () => {
-      await token.transfer(0x0, amount, { from: deployer }).should.be.rejected
+  })
+
+
+  describe('approving tokens', () => {
+    let amount
+    let result
+
+    beforeEach(async () => {
+      amount = tokens(100)
+      result = await token.approve(exchange, amount, { from: deployer })
+    })
+
+    describe('success', () => {
+      it('allocates allowance for delegated token spending on exchange', async () => {
+        const allowance = await token.allowance(deployer, exchange)
+        allowance.toString().should.equal(amount.toString())
+      })
+    })
+    describe('failure', () => {
+
     })
   })
 })
