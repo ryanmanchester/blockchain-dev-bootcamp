@@ -100,6 +100,14 @@ contract('Token', ([deployer, receiver, exchange]) => {
         const allowance = await token.allowance(deployer, exchange)
         allowance.toString().should.equal(amount.toString())
       })
+      it('emits approval event', async () => {
+        const log = result.logs[0]
+        log.event.should.equal('Approval')
+        const event = log.args
+        event.owner.toString().should.equal(deployer, 'owner is correct')
+        event.spender.toString().should.equal(exchange, 'spender is correct')
+        event.value.toString().should.equal(amount.toString(), 'value is correct')
+      })
     })
     describe('failure', () => {
 

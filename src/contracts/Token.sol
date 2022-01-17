@@ -12,6 +12,7 @@ contract Token {
 
   //Event
   event Transfer(address indexed from , address indexed to, uint256 value);
+  event Approval(address indexed owner, address indexed spender, uint256 value);
 
   mapping(address => uint256) public balanceOf;
   mapping(address => mapping(address => uint256)) public allowance;
@@ -31,6 +32,7 @@ contract Token {
 
   function approve(address _spender, uint256 _value) public returns (bool success) {
     allowance[msg.sender][_spender] = _value;
+    emit Approval(msg.sender, _spender, _value);
     return true;
   }
 
