@@ -115,4 +115,50 @@ contract('Token', ([deployer, receiver, exchange]) => {
       })
     })
   })
+
+  describe('transfers tokens', () => {
+    let amount
+    let result
+    beforeEach(async () => {
+      amount = tokens(100)
+      await token.approve(exchange, amount, { from: deployer })
+    })
+    describe('success', () => {
+
+      beforeEach(async () => {
+        result = await token.transferFrom(deployer, receiver, amount, { from: exchange })
+      })
+
+      it('transfers token balances', async () => {
+        let balanceOf;
+
+        balanceOf = await token.balanceOf(deployer)
+        balanceOf.toString().should.equal(tokens(999900).toString())
+        balanceOf = await token.balanceOf(receiver)
+        balanceOf.toString().should.equal(tokens(100).toString())
+
+      })
+      // it('emits transfer event', async () => {
+      //   const log = result.logs[0]
+      //   log.event.should.equal('Transfer')
+      //   const event = log.args
+      //   event.from.toString().should.equal(deployer, 'from is correct')
+      //   event.to.toString().should.equal(receiver, 'to is correct')
+      //   event.value.toString().should.equal(amount.toString(), 'value is correct')
+      // })
+    })
+    // describe('failure', () => {
+    //   it('rejects insuffecient balances', async () => {
+    //     let invalidAmount
+    //     invalidAmount = tokens(100000000) //100 million
+    //     await token.transfer(receiver, invalidAmount, { from: deployer }).should.be.rejectedWith(EVM_REVERT)
+    //
+    //     invalidAmount = tokens(10)
+    //     await token.transfer(deployer, invalidAmount, { from: receiver }).should.be.rejectedWith(EVM_REVERT)
+    //   })
+    //   it('rejects infvalid recipients', async () => {
+    //     await token.transfer(0x0, amount, { from: deployer }).should.be.rejected
+    //   })
+    // })
+  })
 })
