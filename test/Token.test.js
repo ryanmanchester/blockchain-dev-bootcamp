@@ -116,7 +116,7 @@ contract('Token', ([deployer, receiver, exchange]) => {
     })
   })
 
-  describe('transfers tokens', () => {
+  describe('transfers tokens from', () => {
     let amount
     let result
     beforeEach(async () => {
@@ -131,21 +131,25 @@ contract('Token', ([deployer, receiver, exchange]) => {
 
       it('transfers token balances', async () => {
         let balanceOf;
-
         balanceOf = await token.balanceOf(deployer)
         balanceOf.toString().should.equal(tokens(999900).toString())
         balanceOf = await token.balanceOf(receiver)
         balanceOf.toString().should.equal(tokens(100).toString())
-
       })
-      // it('emits transfer event', async () => {
-      //   const log = result.logs[0]
-      //   log.event.should.equal('Transfer')
-      //   const event = log.args
-      //   event.from.toString().should.equal(deployer, 'from is correct')
-      //   event.to.toString().should.equal(receiver, 'to is correct')
-      //   event.value.toString().should.equal(amount.toString(), 'value is correct')
-      // })
+
+      it('resets the allowance', async () => {
+        const allowance = await token.allowance(deployer, exchange)
+        allowance.toString().should.equal('0')
+      })
+
+      it('emits transfer event', async () => {
+        const log = result.logs[0]
+        log.event.should.equal('Transfer')
+        const event = log.args
+        event.from.toString().should.equal(deployer, 'from is correct')
+        event.to.toString().should.equal(receiver, 'to is correct')
+        event.value.toString().should.equal(amount.toString(), 'value is correct')
+      })
     })
     // describe('failure', () => {
     //   it('rejects insuffecient balances', async () => {
