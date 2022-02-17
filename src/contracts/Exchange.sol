@@ -9,7 +9,9 @@ contract Exchange {
   address public feeAccount;
   uint256 public feePercent;
   address constant ETHER = address(0); //store Ether in tokens mapping with blank address
+
   event Deposit(address token, address user, uint256 amount, uint256 balance);
+  event Withdraw(address token, address user, uint amount, uint balance);
   mapping(address => mapping(address => uint256)) public tokens;
   constructor (address _feeAccount, uint256 _feePercent) public {
     feeAccount = _feeAccount;
@@ -25,6 +27,7 @@ contract Exchange {
 
   function withdrawEther(uint _amount) public {
     tokens[ETHER][msg.sender] = tokens[ETHER][msg.sender].sub(_amount);
+    emit Withdraw(ETHER, msg.sender, _amount, tokens[ETHER][msg.sender]);
   }
 
   function depositToken(address _token, uint _amount) public {
