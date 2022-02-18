@@ -9,14 +9,21 @@ contract Exchange {
   address public feeAccount;
   uint256 public feePercent;
   address constant ETHER = address(0); //store Ether in tokens mapping with blank address
+  mapping(address => mapping(address => uint256)) public tokens;
 
   event Deposit(address token, address user, uint256 amount, uint256 balance);
   event Withdraw(address token, address user, uint amount, uint balance);
-  mapping(address => mapping(address => uint256)) public tokens;
+
+  //model order
+  //store order
+  //add order to storage
+  
+
   constructor (address _feeAccount, uint256 _feePercent) public {
     feeAccount = _feeAccount;
     feePercent = _feePercent;
   }
+  //Fallbak: revert if Ether is sent to this smart contract by mistake
   function() external {
     revert();
   }
