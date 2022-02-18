@@ -148,6 +148,23 @@ contract('Exchange', ([deployer, feeAccount, user1]) => {
         event.balance.toString().should.equal('0', 'balance is correct')
       })
     })
+    describe('failure', async () => {
+      it('rejects Ether withdraws', async () => {
+        await exchange.withdrawToken(ETHER_ADDRESS, tokens(10), { from: user1 }).should.be.rejectedWith(EVM_REVERT)
+      })
+      it('fails for insufficient balances', async () => {
+        await exchange.withdrawToken(token.address, tokens(10), { from: user1 }).should.be.rejectedWith(EVM_REVERT)
+      })
+    })
+    describe('checking balances', async () => {
+      beforeEach(async () => {
+        exchange.depositEther({ from: user1, value: ether(1) })
+      })
+      it('returns user balance', async () => {
+        const result = await exchange.balanceOf(ETHER_ADDRESS, user1)
+        result.toString().should.equal(ether(1).toString())
+      })
+    })
   })
 
 })
