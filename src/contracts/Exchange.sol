@@ -16,7 +16,7 @@ contract Exchange {
   event Deposit(address token, address user, uint256 amount, uint256 balance);
   event Withdraw(address token, address user, uint256 amount, uint256 balance);
   event Order(
-    uint id,
+    uint256 id,
     address user,
     address tokenGet,
     uint amountGet,
@@ -26,10 +26,10 @@ contract Exchange {
   );
 
   struct _Order {
-    uint id;
+    uint256 id;
     address user;
     address tokenGet;
-    uint amountGet;
+    uint256 amountGet;
     address tokenGive;
     uint256 amountGive;
     uint256 timestamp;
