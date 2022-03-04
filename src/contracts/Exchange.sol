@@ -11,8 +11,9 @@ contract Exchange {
   address constant ETHER = address(0); //store Ether in tokens mapping with blank address
   mapping(address => mapping(address => uint256)) public tokens;
   mapping(uint256 => _Order) public orders;
-  mapping(uint256 => bool) public orderCancelled;
   uint256 public orderCount;
+  mapping(uint256 => bool) public orderCancelled;
+  mapping(uint256 => bool) public orderFilled;
 
   event Deposit(address token, address user, uint256 amount, uint256 balance);
   event Withdraw(address token, address user, uint256 amount, uint256 balance);
@@ -114,10 +115,14 @@ contract Exchange {
   }
 
   function fillOrder(uint256 _id) public {
+    require(_id > 0 && _id <= orderCount);
+    require(!orderFilled[_id]);
+    require(!orderCancelled[_id]);
     //Fetch order
-    //Mark order as filled
     _Order storage _order = orders[id];
     _trade(_order.id, _order.user, _order.tokenGet, _order.amountGet, _order.tokenGive, _order.amountGive);
+    //Mark order as filled
+    orderFilled[_order.id] = true;
   }
   function _trade(uint256 _orderId, address _user, address _tokenGet, uint256 _amountGet, address _tokenGive, uint256 _amountGive) internal {
     uint256 _feeAmount = _amountGive.mul(feePercent).div(100);
