@@ -125,7 +125,7 @@ contract Exchange {
     orderFilled[_order.id] = true;
   }
   function _trade(uint256 _orderId, address _user, address _tokenGet, uint256 _amountGet, address _tokenGive, uint256 _amountGive) internal {
-    uint256 _feeAmount = _amountGive.mul(feePercent).div(100);
+    uint256 _feeAmount = _amountGet.mul(feePercent).div(100);
     //Execute order
       //charge fees
     tokens[_tokenGet][msg.sender] = tokens[_tokenGet][msg.sender].sub(_amountGet.add(_feeAmount));
