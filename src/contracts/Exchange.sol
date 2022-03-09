@@ -119,7 +119,7 @@ contract Exchange {
     require(!orderFilled[_id]);
     require(!orderCancelled[_id]);
     //Fetch order
-    _Order storage _order = orders[id];
+    _Order storage _order = orders[_id];
     _trade(_order.id, _order.user, _order.tokenGet, _order.amountGet, _order.tokenGive, _order.amountGive);
     //Mark order as filled
     orderFilled[_order.id] = true;

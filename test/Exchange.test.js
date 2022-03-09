@@ -197,8 +197,38 @@ contract('Exchange', ([deployer, feeAccount, user1, user2 ]) => {
     })
     describe('order actions', async () => {
       beforeEach(async () => {
+        //user1 deposits ether
         await exchange.depositEther({from: user1, value: ether(1)})
+        //give tokens to user2
+        await token.transfer(user2, tokens(100), { from: deployer })
+        await token.approve(exchange.address, tokens(2), {from: user2})
+        //user2 deposits tokens
+        await exchange.depositToken(token.address, tokens(2), { from: user2 })
+        //user1 makes order to buy tokens with ether
         await exchange.makeOrder(token.address, tokens(1), ETHER_ADDRESS, ether(1), { from: user1 })
+      })
+      describe('filling orders', async () => {
+        let result;
+        describe('success', async () => {
+          beforeEach(async () => {
+            result = await exchange.fillOrder('1', { from: user2 })
+          })
+          it('executes trade and charges fee', async () => {
+            let balance
+            balance = await exchange.balanceOf(token.address, user1)
+            balance.toString().should.equal(tokens(1).toString(), 'user1 received tokens')
+            balance = await exchange.balanceOf(ETHER_ADDRESS, user2)
+            balance.toString().should.equal(ether(1).toString(), 'user2 received Ether')
+            balance = await exchange.balanceOf(ETHER_ADDRESS, user1)
+            balance.toString().should.equal('0', 'user1 Ether deducted')
+            balance = await exchange.balanceOf(token.address, user2)
+            balance.toString().should.equal(tokens(0.9).toString(), 'user2 tokens deducted with fee applied')
+            const feeAccount = await exchange.feeAccount()
+            balance = await exchange.balanceOf(token.address, feeAccount)
+            balance.toString().should.equal(tokens(0.1).toString(), 'feeAccount received fee')
+          })
+        })
+
       })
       describe('cancelling orders', async () => {
         let result
