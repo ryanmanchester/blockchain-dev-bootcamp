@@ -254,6 +254,10 @@ contract('Exchange', ([deployer, feeAccount, user1, user2 ]) => {
             await exchange.fillOrder('1', { from: user2 }).should.be.fulfilled
             await exchange.fillOrder('1', { from: user2 }).should.be.rejectedWith(EVM_REVERT)
           })
+          it('rejects canelled orders', async () => {
+            await exchange.cancelOrder('1', { from: user1 }).should.be.fulfilled
+            await exchange.cancelOrder('1', { from: user2 }).should.be.rejectedWith(EVM_REVERT)
+          })
         })
 
       })
