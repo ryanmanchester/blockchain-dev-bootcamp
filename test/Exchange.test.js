@@ -250,7 +250,10 @@ contract('Exchange', ([deployer, feeAccount, user1, user2 ]) => {
             const invalidOrderId = 99999
             await exchange.fillOrder(invalidOrderId, {from: user2}).should.be.rejectedWith(EVM_REVERT)
           })
-          
+          it('rejects duplicate filled orders', async () => {
+            await exchange.fillOrder('1', { from: user2 }).should.be.fulfilled
+            await exchange.fillOrder('1', { from: user2 }).should.be.rejectedWith(EVM_REVERT)
+          })
         })
 
       })
