@@ -245,6 +245,13 @@ contract('Exchange', ([deployer, feeAccount, user1, user2 ]) => {
             event.timestamp.toString().length.should.be.at.least(1, 'timestamp is present')
           })
         })
+        describe('failure', async () => {
+          it('rejects invalid order ids', async () => {
+            const invalidOrderId = 99999
+            await exchange.fillOrder(invalidOrderId, {from: user2}).should.be.rejectedWith(EVM_REVERT)
+          })
+          
+        })
 
       })
       describe('cancelling orders', async () => {
