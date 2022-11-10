@@ -97,12 +97,12 @@ module.exports = async function(callback) {
     //Seed open orders
     //User 1 makes 10 orders
     for(let i = 1; i <= 10; i++) {
-      resutl = await exchange.makeOrder(token.address, tokens(10 * i), ETHER_ADDRESS, ether(0.01), {from: user1})
+      result = await exchange.makeOrder(token.address, tokens(10 * i), ETHER_ADDRESS, ether(0.01), {from: user1})
       console.log(`Made order from ${user1}`)
       await wait(1)
     }
     for(let i = 1; i <= 10; i++) {
-      resutl = await exchange.makeOrder(ETHER_ADDRESS, ether(0.01), token.address, tokens(10 * i), {from: user2})
+      result = await exchange.makeOrder(ETHER_ADDRESS, ether(0.01), token.address, tokens(10 * i), {from: user2})
       console.log(`Made order from ${user2}`)
       await wait(1)
     }
